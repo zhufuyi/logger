@@ -1,2 +1,2 @@
 # logger
-在go.uber.org/zap基础上封装的日志库
+在[zap](https://github.com/uber-go/zap)基础上封装的go语言日志库
