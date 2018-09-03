@@ -12,17 +12,17 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
-var logger *zap.Logger
+var defaultLogger *zap.Logger
 
 func getLogger() *zap.Logger {
-	if logger == nil {
+	if defaultLogger == nil {
 		err := InitLogger(false, "", "debug") // 默认输出到控台
 		if err != nil {
 			log.Fatal(err)
 		}
 	}
 
-	return logger.WithOptions(zap.AddCallerSkip(1))
+	return defaultLogger.WithOptions(zap.AddCallerSkip(1))
 }
 
 // InitLogger 初始化日志
@@ -95,16 +95,16 @@ func InitLogger(isSave bool, filename string, level string, encodingType ...stri
 		config.EncoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
 	}
 
-	logger, err = config.Build()
+	defaultLogger, err = config.Build()
 	if err != nil {
 		return err
 	}
 
 	// 打印log配置结果
 	if isSave {
-		Infof("initialize logger finish, base logger config is isSave=%t, filename=%s, level=%s, encoding=%s", isSave, filename, level, encoding)
+		Infof("initialize logger finish, base config is isSave=%t, filename=%s, level=%s, encoding=%s", isSave, filename, level, encoding)
 	} else {
-		Infof("initialize logger finish, base logger config is isSave=%t, level=%s, encoding=%s", isSave, level, encoding)
+		Infof("initialize logger finish, base config is isSave=%t, level=%s, encoding=%s", isSave, level, encoding)
 	}
 
 	return nil
@@ -141,27 +141,27 @@ func Ctx(ctx context.Context) *zap.Logger {
 
 // ----------------------------------重新封装zap的log----------------------------------------
 
-func Debug(msg string, fields ...zap.Field) {
+func Debug(msg string, fields ...Field) {
 	getLogger().Debug(msg, fields...)
 }
 
-func Info(msg string, fields ...zap.Field) {
+func Info(msg string, fields ...Field) {
 	getLogger().Info(msg, fields...)
 }
 
-func Warn(msg string, fields ...zap.Field) {
+func Warn(msg string, fields ...Field) {
 	getLogger().Warn(msg, fields...)
 }
 
-func Error(msg string, fields ...zap.Field) {
+func Error(msg string, fields ...Field) {
 	getLogger().Error(msg, fields...)
 }
 
-func Panic(msg string, fields ...zap.Field) {
+func Panic(msg string, fields ...Field) {
 	getLogger().Panic(msg, fields...)
 }
 
-func Fatal(msg string, fields ...zap.Field) {
+func Fatal(msg string, fields ...Field) {
 	getLogger().Fatal(msg, fields...)
 }
 
@@ -185,61 +185,63 @@ func Fatalf(format string, a ...interface{}) {
 	getLogger().Fatal(fmt.Sprintf(format, a...))
 }
 
-func WithFields(fields ...zap.Field) *zap.Logger {
+func WithFields(fields ...Field) *zap.Logger {
 	return getLogger().With(fields...)
 }
 
 // ----------------------- 重新封装类型 ---------------------------
 
-func Int(key string, val int) zap.Field {
+type Field = zapcore.Field
+
+func Int(key string, val int) Field {
 	return zap.Int(key, val)
 }
 
-func Int64(key string, val int64) zap.Field {
+func Int64(key string, val int64) Field {
 	return zap.Int64(key, val)
 }
 
-func Uint(key string, val uint) zap.Field {
+func Uint(key string, val uint) Field {
 	return zap.Uint(key, val)
 }
 
-func Uint64(key string, val uint64) zap.Field {
+func Uint64(key string, val uint64) Field {
 	return zap.Uint64(key, val)
 }
 
-func Uintptr(key string, val uintptr) zap.Field {
+func Uintptr(key string, val uintptr) Field {
 	return zap.Uintptr(key, val)
 }
 
-func Float64(key string, val float64) zap.Field {
+func Float64(key string, val float64) Field {
 	return zap.Float64(key, val)
 }
 
-func Bool(key string, val bool) zap.Field {
+func Bool(key string, val bool) Field {
 	return zap.Bool(key, val)
 }
 
-func String(key string, val string) zap.Field {
+func String(key string, val string) Field {
 	return zap.String(key, val)
 }
 
-func Stringer(key string, val fmt.Stringer) zap.Field {
+func Stringer(key string, val fmt.Stringer) Field {
 	return zap.Stringer(key, val)
 }
 
-func Time(key string, val time.Time) zap.Field {
+func Time(key string, val time.Time) Field {
 	return zap.Time(key, val)
 }
 
-func Duration(key string, val time.Duration) zap.Field {
+func Duration(key string, val time.Duration) Field {
 	return zap.Duration(key, val)
 }
 
-func Err(err error) zap.Field {
+func Err(err error) Field {
 	return zap.Error(err)
 }
 
 // 任意类型，如果是对象、slice、map等复合类型，使用Any
-func Any(key string, val interface{}) zap.Field {
+func Any(key string, val interface{}) Field {
 	return zap.Any(key, val)
 }
