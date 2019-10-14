@@ -203,6 +203,9 @@ func WithFields(fields ...Field) *zap.Logger {
 
 // ----------------------- 重新封装类型 ---------------------------
 
+// ZapLogger logger类型
+type ZapLogger = zap.Logger
+
 // Field 字段类型
 type Field = zapcore.Field
 
