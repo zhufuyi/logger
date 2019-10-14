@@ -141,107 +141,144 @@ func Ctx(ctx context.Context) *zap.Logger {
 
 // ----------------------------------重新封装zap的log----------------------------------------
 
+// Debug debug级别信息
 func Debug(msg string, fields ...Field) {
 	getLogger().Debug(msg, fields...)
 }
 
+// Info info级别信息
 func Info(msg string, fields ...Field) {
 	getLogger().Info(msg, fields...)
 }
 
+// Warn warn级别信息
 func Warn(msg string, fields ...Field) {
 	getLogger().Warn(msg, fields...)
 }
 
+// Error error级别信息
 func Error(msg string, fields ...Field) {
 	getLogger().Error(msg, fields...)
 }
 
+// Panic panic级别信息
 func Panic(msg string, fields ...Field) {
 	getLogger().Panic(msg, fields...)
 }
 
+// Fatal fatal级别信息
 func Fatal(msg string, fields ...Field) {
 	getLogger().Fatal(msg, fields...)
 }
 
+// Debugf 带格式化debug级别信息
 func Debugf(format string, a ...interface{}) {
 	getLogger().Debug(fmt.Sprintf(format, a...))
 }
 
+// Infof 带格式化info级别信息
 func Infof(format string, a ...interface{}) {
 	getLogger().Info(fmt.Sprintf(format, a...))
 }
 
+// Warnf 带格式化warn级别信息
 func Warnf(format string, a ...interface{}) {
 	getLogger().Warn(fmt.Sprintf(format, a...))
 }
 
+// Errorf 带格式化error级别信息
 func Errorf(format string, a ...interface{}) {
 	getLogger().Error(fmt.Sprintf(format, a...))
 }
 
+// Fatalf 带格式化fatal级别信息
 func Fatalf(format string, a ...interface{}) {
 	getLogger().Fatal(fmt.Sprintf(format, a...))
 }
 
+// WithFields 携带字段信息
 func WithFields(fields ...Field) *zap.Logger {
 	return getLogger().With(fields...)
 }
 
 // ----------------------- 重新封装类型 ---------------------------
 
+// Field 字段类型
 type Field = zapcore.Field
 
+// Int int类型
 func Int(key string, val int) Field {
 	return zap.Int(key, val)
 }
 
+// Int64 int64类型
 func Int64(key string, val int64) Field {
 	return zap.Int64(key, val)
 }
 
+// Uint uint类型
 func Uint(key string, val uint) Field {
 	return zap.Uint(key, val)
 }
 
+// Uint64 uint64类型
 func Uint64(key string, val uint64) Field {
 	return zap.Uint64(key, val)
 }
 
+// Uintptr uintptr类型
 func Uintptr(key string, val uintptr) Field {
 	return zap.Uintptr(key, val)
 }
 
+// Float64 float64类型
 func Float64(key string, val float64) Field {
 	return zap.Float64(key, val)
 }
 
+// Bool bool类型
 func Bool(key string, val bool) Field {
 	return zap.Bool(key, val)
 }
 
+// String string类型
 func String(key string, val string) Field {
 	return zap.String(key, val)
 }
 
+// Stringer stringer类型
 func Stringer(key string, val fmt.Stringer) Field {
 	return zap.Stringer(key, val)
 }
 
+// Time time.Time类型
 func Time(key string, val time.Time) Field {
 	return zap.Time(key, val)
 }
 
+// Duration time.Duration类型
 func Duration(key string, val time.Duration) Field {
 	return zap.Duration(key, val)
 }
 
+// Err err类型
 func Err(err error) Field {
 	return zap.Error(err)
 }
 
-// 任意类型，如果是对象、slice、map等复合类型，使用Any
+// Any 任意类型，如果是对象、slice、map等复合类型，使用Any
 func Any(key string, val interface{}) Field {
 	return zap.Any(key, val)
+}
+
+// GetLogger 获取defaultLogger，设置caller值才能正确的显示对应的代码行数
+func GetLogger(skip int) *zap.Logger {
+	if defaultLogger == nil {
+		err := InitLogger(false, "", "debug") // 默认输出到控台
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+
+	return defaultLogger.WithOptions(zap.AddCallerSkip(skip))
 }
